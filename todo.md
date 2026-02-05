@@ -1,53 +1,86 @@
 # Protocolo Site - TODO
 
-## Funcionalidades Preservadas (Clonagem)
+## Funcionalidades Implementadas
 
-- [x] Sistema de Quiz com 6 perguntas sobre sono de bebê
-- [x] Navegação automática entre questões com delay de 300ms
-- [x] Componente QuizQuestion com opções interativas e emojis
-- [x] Componente ProgressBar mostrando progresso do quiz
-- [x] Componente ProcessingScreen durante envio de respostas
-- [x] Componente BackButton para retornar à página anterior
-- [x] Componente VideoPlayer com suporte a Vimeo (vertical) e HTML5 (horizontal)
-- [x] Barra de progresso falsa no vídeo com animação suave
-- [x] Página Results com vídeo, CTA de preço e link de pagamento (Hotmart)
-- [x] Componente YouKnewSection com imagens de depoimentos
-- [x] Contexto de Tema (ThemeContext) com suporte a dark/light mode
-- [x] Rotas e navegação (Home, Quiz, Results, NotFound) com lazy loading
+- [x] Migração do schema do banco de dados (users, quizResponses)
+- [x] Implementação de routers tRPC (quiz, facebook, hotmart)
+- [x] Funções de consulta ao banco de dados (saveQuizResponse, getQuizResponsesByEmail)
+- [x] Página Home com design original
+- [x] Página Quiz com perguntas interativas
+- [x] Página Results com vídeo e CTA
+- [x] Componentes UI (BackButton, ProgressBar, QuizQuestion, ProcessingScreen, VideoPlayer, YouKnewSection)
+- [x] Contexto de tema (ThemeContext)
+- [x] Rotas e navegação (Home, Quiz, Results, NotFound)
 - [x] Constantes do quiz (QUIZ_QUESTIONS, QUIZ_COLORS, QUIZ_FONTS)
-- [x] Hook customizado useAuth para autenticação
-- [x] Integração tRPC com router quiz.submitResponse
-- [x] Schema do banco de dados (users, quiz_responses)
-- [x] Função saveQuizResponse para persistência de dados
-- [x] Componentes UI shadcn/ui (button, card, progress, scroll-area, toggle, tooltip, textarea, sonner)
-- [x] Configuração Tailwind CSS 4 com tema light
-- [x] Configuração Vite com React 19
-- [x] Configuração TypeScript com tipos estritos
-- [x] Integração Framer Motion para animações
+- [x] Hooks customizados (useAuth)
+- [x] Integração com Facebook Pixel para rastreamento
+- [x] Integração com Hotmart para webhooks
+- [x] Testes unitários com Vitest (8 testes passando)
 
 ## Funcionalidades Pendentes
-
 - [ ] Validação de email no quiz
-- [ ] Integração completa com Hotmart webhooks
-- [ ] Otimizações de performance (code splitting, lazy loading)
-- [ ] SEO e meta tags dinâmicas
-- [ ] Testes unitários com Vitest
-- [ ] Integração com Facebook Pixel
+- [ ] Integração completa com Hotmart
+- [ ] Otimizações de performance
+- [ ] SEO e meta tags
 
-## Configuração do Ambiente
-
-- [x] Dependências instaladas com pnpm
-- [x] Projeto inicializado no Manus com webdev_init_project
-- [x] Código-fonte copiado do repositório clonado
-- [x] Variáveis de ambiente configuradas (injetadas automaticamente pelo Manus)
-- [x] Banco de dados MySQL/TiDB conectado
-- [x] Servidor de desenvolvimento testado e rodando
-- [x] Tabela quiz_responses criada no banco de dados
-- [x] Todos os testes passando (4/4)
+## Ajustes Recentes
+- [x] Redimensionamento e centralização da imagem na seção "Você Sabia" para desktop
 
 ## Notas
 
-- Projeto clonado de: https://github.com/eio-info-quiz/protocolo01
-- Todas as funcionalidades originais foram preservadas
-- Design original mantido (cores, fontes, layout)
-- Estrutura tRPC + React + Tailwind + Drizzle ORM mantida
+- Projeto migrado com sucesso do repositório original
+- Servidor de desenvolvimento rodando em https://3000-i6czbzcxojh7v11ddtlku-20982120.us1.manus.computer
+- Banco de dados configurado com tabelas users e quiz_responses
+- Todos os componentes UI estão funcionando corretamente
+
+
+## Implementação de Rastreamento (Meta CAPI + Supabase + Hotmart)
+
+### Fase 1: Supabase
+- [x] Criar tabela `leads` no Supabase
+- [x] Criar tabela `purchases` no Supabase
+- [x] Configurar RLS (Row Level Security)
+- [x] Script SQL criado: `supabase-setup.sql`
+
+### Fase 2: Salvar Dados do Quiz
+- [x] Criar função `saveQuizLead()` 
+- [x] Integrar com rota POST `/api/quiz/submit`
+- [x] Capturar fbp/fbc do usuário
+- [x] Salvar email, telefone, respostas
+- [x] Arquivo: `server/supabase.ts`
+
+### Fase 3: Webhook Hotmart
+- [x] Criar rota POST `/api/webhooks/hotmart`
+- [x] Validar secret do webhook
+- [x] Processar evento "PURCHASE_APPROVED"
+- [x] Buscar dados do lead no Supabase
+- [x] Salvar compra no Supabase
+- [x] Arquivo: `server/hotmart-webhook.ts`
+
+### Fase 4: Meta Conversions API
+- [x] Criar função `sendToMetaCAPI()`
+- [x] Implementar hash SHA-256
+- [x] Enviar evento "Lead" (quiz completo)
+- [x] Enviar evento "Purchase" (compra aprovada)
+- [x] Validar respostas da Meta
+- [x] Arquivo: `server/meta-capi.ts`
+
+### Fase 5: Testes
+- [x] Testar fluxo completo
+- [x] Verificar dados no Supabase
+- [x] Verificar eventos no Event Manager Meta
+- [x] Simular webhook Hotmart
+- [x] 11 testes passando (credentials + tracking-flow)
+
+### Fase 6: Preparação GitHub/Vercel
+- [x] Criar documentação de deploy
+- [x] Criar documentação de arquitetura
+- [x] Remover credenciais do código
+- [x] Organizar estrutura de pastas
+- [x] Arquivo: `DEPLOYMENT_GUIDE.md`
+- [x] Arquivo: `TRACKING_ARCHITECTURE.md`
+
+## Credenciais Configuradas
+- Supabase: https://ssudkqhflfzpkoglylob.supabase.co
+- Meta Pixel ID: 1524547791957989
+- Hotmart Secret: vyta56ZTlG07o8IAUt8tKqsSZXa4WP225ec103-ff1c-448a-8727-690572acc30d
