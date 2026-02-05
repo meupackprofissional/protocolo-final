@@ -3,7 +3,7 @@
   "outputDirectory": "dist",
   "devCommand": "pnpm dev",
   "installCommand": "pnpm install",
-  "framework": "other",
+  "framework": "vite",
   "rewrites": [
     {
       "source": "/api/(.*)",
