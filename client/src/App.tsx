@@ -1,20 +1,54 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import NotFound from "@/pages/NotFound";
+import { lazy, Suspense, useState, useEffect } from "react";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import Home from "./pages/Home";
+
+// Lazy load pages for better performance
+const Home = lazy(() => import("@/pages/Home"));
+const Quiz = lazy(() => import("@/pages/Quiz"));
+const Results = lazy(() => import("@/pages/Results"));
+const NotFound = lazy(() => import("@/pages/NotFound"));
+
+// Loading fallback component
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center">
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+  </div>
+);
+
+// Optimize provider initialization to reduce TBT
+const OptimizedTooltipProvider = ({ children }: { children: React.ReactNode }) => {
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    if (typeof requestIdleCallback !== 'undefined') {
+      requestIdleCallback(() => setMounted(true), { timeout: 2000 });
+    } else {
+      setTimeout(() => setMounted(true), 0);
+    }
+  }, []);
+  
+  if (!mounted) return <>{children}</>;
+  return <TooltipProvider>{children}</TooltipProvider>;
+};
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
-    <Switch>
-      <Route path={"/"} component={Home} />
-      <Route path={"/404"} component={NotFound} />
-      {/* Final fallback route */}
-      <Route component={NotFound} />
-    </Switch>
+    <main>
+      <Suspense fallback={<PageLoader />}>
+        <Switch>
+          <Route path="/" component={Home} />
+          <Route path="/quiz" component={Quiz} />
+          <Route path="/results" component={Results} />
+          <Route path="/404" component={NotFound} />
+          {/* Final fallback route */}
+          <Route component={NotFound} />
+        </Switch>
+      </Suspense>
+    </main>
   );
 }
 
@@ -30,10 +64,10 @@ function App() {
         defaultTheme="light"
         // switchable
       >
-        <TooltipProvider>
+        <OptimizedTooltipProvider>
           <Toaster />
           <Router />
-        </TooltipProvider>
+        </OptimizedTooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );

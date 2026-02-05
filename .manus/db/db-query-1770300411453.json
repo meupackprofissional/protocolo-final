@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `quiz_responses` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`email` varchar(320) NOT NULL,\n\t`name` varchar(255),\n\t`baby_age` varchar(100) NOT NULL,\n\t`wake_ups` varchar(100) NOT NULL,\n\t`sleep_method` varchar(255) NOT NULL,\n\t`has_routine` varchar(50) NOT NULL,\n\t`mother_feeling` varchar(255) NOT NULL,\n\t`tried_other_methods` varchar(50) NOT NULL,\n\t`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n\t`updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n\tCONSTRAINT `quiz_responses_id` PRIMARY KEY(`id`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 41o6SrLM16RX2BD.root --database ZQkSvonDXZthdUnDPm6H5k --execute CREATE TABLE IF NOT EXISTS `quiz_responses` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`email` varchar(320) NOT NULL,\n\t`name` varchar(255),\n\t`baby_age` varchar(100) NOT NULL,\n\t`wake_ups` varchar(100) NOT NULL,\n\t`sleep_method` varchar(255) NOT NULL,\n\t`has_routine` varchar(50) NOT NULL,\n\t`mother_feeling` varchar(255) NOT NULL,\n\t`tried_other_methods` varchar(50) NOT NULL,\n\t`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n\t`updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n\tCONSTRAINT `quiz_responses_id` PRIMARY KEY(`id`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 797
+}
