@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from "react";
 import { useLocation } from "wouter";
 import { AnimatePresence } from "framer-motion";
-import { QUIZ_QUESTIONS, QUIZ_COLORS, QUIZ_FONTS } from "@/constants/quiz";
+import { QUIZ_QUESTIONS, QUIZ_COLORS } from "@/constants/quiz";
 import ProgressBar from "@/components/ProgressBar";
 import QuizQuestion from "@/components/QuizQuestion";
 import ProcessingScreen from "@/components/ProcessingScreen";
@@ -20,11 +20,21 @@ export default function Quiz() {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const submitQuizMutation = trpc.quiz.submitResponse.useMutation();
+  const utils = trpc.useUtils();
 
   const handleSubmitQuiz = useCallback(async (finalAnswers: any) => {
     setIsProcessing(true);
 
     try {
+      // Validate that all answers are present
+      if (!finalAnswers.babyAge || !finalAnswers.wakeUps || !finalAnswers.sleepMethod || 
+          !finalAnswers.hasRoutine || !finalAnswers.motherFeeling) {
+        console.error("Missing quiz answers:", finalAnswers);
+        toast.error("Por favor, responda todas as perguntas.");
+        setIsProcessing(false);
+        return;
+      }
+
       const response = await submitQuizMutation.mutateAsync({
         email: `lead-${Date.now()}@quiz.local`,
         name: undefined,
@@ -37,6 +47,9 @@ export default function Quiz() {
       });
 
       if (response.success) {
+        // Invalidate queries and redirect
+        await utils.invalidate();
+        
         // Simulate processing time
         await new Promise((resolve) => setTimeout(resolve, 3000));
 
@@ -51,29 +64,31 @@ export default function Quiz() {
   }, [submitQuizMutation, setLocation]);
 
   const handleSelectAnswer = useCallback((value: string) => {
-    setAnswers(prev => ({
-      ...prev,
+    const updatedAnswers = {
+      ...answers,
       [currentQuestion]: value,
-    }));
+    };
+    setAnswers(updatedAnswers);
 
     // Auto-advance to next question after a short delay
     const timer = setTimeout(() => {
       if (currentQuestion < QUIZ_QUESTIONS.length - 1) {
         setCurrentQuestion(currentQuestion + 1);
       } else {
+        // Use updatedAnswers instead of stale answers state
         handleSubmitQuiz({
-          babyAge: answers[0] || "",
-          wakeUps: answers[1] || "",
-          sleepMethod: answers[2] || "",
-          hasRoutine: answers[3] || "",
-          motherFeeling: answers[4] || "",
-          triedOtherMethods: answers[5] || "",
+          babyAge: updatedAnswers[0] || "",
+          wakeUps: updatedAnswers[1] || "",
+          sleepMethod: updatedAnswers[2] || "",
+          hasRoutine: updatedAnswers[3] || "",
+          motherFeeling: updatedAnswers[4] || "",
+          triedOtherMethods: updatedAnswers[5] || "",
         });
       }
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [currentQuestion, answers, handleSubmitQuiz]);
+  }, [currentQuestion, handleSubmitQuiz])
 
   const currentQuestionData = useMemo(() => QUIZ_QUESTIONS[currentQuestion], [currentQuestion]);
 
