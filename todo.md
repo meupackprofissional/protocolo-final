@@ -104,3 +104,6 @@
 2. Deploy na Vercel
 3. Configurar webhook na Hotmart
 4. Testar
+
+## Sincronização GitHub
+- [x] Projeto sincronizado com GitHub (2026-02-05 17:45)
