@@ -15,29 +15,6 @@ export const appRouter = router({
       } as const;
     }),
   }),
-
-  quiz: router({
-    submitResponse: publicProcedure
-      .input((data: unknown) => {
-        if (typeof data !== 'object' || data === null) throw new Error('Invalid input');
-        const obj = data as Record<string, unknown>;
-        return {
-          email: String(obj.email || ''),
-          name: obj.name ? String(obj.name) : undefined,
-          babyAge: String(obj.babyAge || ''),
-          wakeUps: String(obj.wakeUps || ''),
-          sleepMethod: String(obj.sleepMethod || ''),
-          hasRoutine: String(obj.hasRoutine || ''),
-          motherFeeling: String(obj.motherFeeling || ''),
-          triedOtherMethods: String(obj.triedOtherMethods || ''),
-        };
-      })
-      .mutation(async ({ input }) => {
-        const { saveQuizResponse } = await import('./db');
-        const result = await saveQuizResponse(input);
-        return { success: true, result };
-      }),
-  }),
 });
 
 export type AppRouter = typeof appRouter;

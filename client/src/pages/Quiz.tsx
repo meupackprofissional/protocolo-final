@@ -6,7 +6,6 @@ import ProgressBar from "@/components/ProgressBar";
 import QuizQuestion from "@/components/QuizQuestion";
 import ProcessingScreen from "@/components/ProcessingScreen";
 import BackButton from "@/components/BackButton";
-import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 
 interface QuizAnswers {
@@ -18,50 +17,6 @@ export default function Quiz() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<QuizAnswers>({});
   const [isProcessing, setIsProcessing] = useState(false);
-
-  const submitQuizMutation = trpc.quiz.submitResponse.useMutation();
-  const utils = trpc.useUtils();
-
-  const handleSubmitQuiz = useCallback(async (finalAnswers: any) => {
-    setIsProcessing(true);
-
-    try {
-      // Validate that all answers are present
-      if (!finalAnswers.babyAge || !finalAnswers.wakeUps || !finalAnswers.sleepMethod || 
-          !finalAnswers.hasRoutine || !finalAnswers.motherFeeling) {
-        console.error("Missing quiz answers:", finalAnswers);
-        toast.error("Por favor, responda todas as perguntas.");
-        setIsProcessing(false);
-        return;
-      }
-
-      const response = await submitQuizMutation.mutateAsync({
-        email: `lead-${Date.now()}@quiz.local`,
-        name: undefined,
-        babyAge: finalAnswers.babyAge,
-        wakeUps: finalAnswers.wakeUps,
-        sleepMethod: finalAnswers.sleepMethod,
-        hasRoutine: finalAnswers.hasRoutine,
-        motherFeeling: finalAnswers.motherFeeling,
-        triedOtherMethods: finalAnswers.triedOtherMethods || "",
-      });
-
-      if (response.success) {
-        // Invalidate queries and redirect
-        await utils.invalidate();
-        
-        // Simulate processing time
-        await new Promise((resolve) => setTimeout(resolve, 3000));
-
-        // Redirect to results page using Wouter for SPA navigation
-        setLocation("/results");
-      }
-    } catch (error) {
-      console.error("Error submitting quiz:", error);
-      toast.error("Erro ao enviar suas respostas. Tente novamente.");
-      setIsProcessing(false);
-    }
-  }, [submitQuizMutation, setLocation]);
 
   const handleSelectAnswer = useCallback((value: string) => {
     const updatedAnswers = {
@@ -75,20 +30,18 @@ export default function Quiz() {
       if (currentQuestion < QUIZ_QUESTIONS.length - 1) {
         setCurrentQuestion(currentQuestion + 1);
       } else {
-        // Use updatedAnswers instead of stale answers state
-        handleSubmitQuiz({
-          babyAge: updatedAnswers[0] || "",
-          wakeUps: updatedAnswers[1] || "",
-          sleepMethod: updatedAnswers[2] || "",
-          hasRoutine: updatedAnswers[3] || "",
-          motherFeeling: updatedAnswers[4] || "",
-          triedOtherMethods: updatedAnswers[5] || "",
-        });
+        // Last question answered - redirect to results
+        setIsProcessing(true);
+        
+        // Simulate processing time
+        setTimeout(() => {
+          setLocation("/results");
+        }, 2000);
       }
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [currentQuestion, handleSubmitQuiz])
+  }, [currentQuestion, answers, setLocation]);
 
   const currentQuestionData = useMemo(() => QUIZ_QUESTIONS[currentQuestion], [currentQuestion]);
 
