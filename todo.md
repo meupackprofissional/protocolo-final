@@ -119,5 +119,29 @@
 3. Configurar webhook na Hotmart
 4. Testar
 
+## Implementação de Rastreamento fbp/fbc (Meta Pixel)
+- [x] Hook useMetaPixel criado para capturar fbp/fbc
+- [x] Rota tRPC tracking.recordLead criada
+- [x] Quiz.tsx integrado para disparar evento de Lead
+- [x] Testes de hashing de dados criados
+- [x] Fluxo completo testado localmente
+- [x] 21 testes passando (incluindo novo teste de tracking)
+
+## Implementação de Evento InitiateCheckout
+- [x] Adicionar função trackInitiateCheckout ao hook useMetaPixel
+- [x] Integrar no botão de compra do Results.tsx
+
+## Consolidação de Dados com ID Único
+- [x] Gerar UUID único ao entrar no quiz (Home.tsx)
+- [x] Armazenar ID no localStorage
+- [x] Enviar ID com Lead event (fbp, fbc, IP, User-Agent) via Quiz.tsx
+- [x] Armazenar ID + dados no Supabase (tabela leads)
+- [x] Webhook Hotmart recupera ID e consolida com dados da compra
+- [x] Enviar Purchase event para Meta com todos os dados consolidados
+- [x] Testes vitest passando (21 testes)
+- [x] Evento InitiateCheckout implementado no botão de compra
+- [x] Fluxo completo testado localmente
+
 ## Sincronização GitHub
 - [x] Projeto sincronizado com GitHub (2026-02-05 17:45)
+- [x] Rastreamento fbp/fbc implementado (2026-02-06 02:45)

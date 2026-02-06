@@ -2,6 +2,7 @@ import { useState, useCallback, useMemo } from "react";
 import { QUIZ_COLORS, QUIZ_FONTS } from "@/constants/quiz";
 import VideoPlayer from "@/components/VideoPlayer";
 import YouKnewSection from "@/components/YouKnewSection";
+import { useMetaPixel } from "@/hooks/useMetaPixel";
 import { motion } from "framer-motion";
 
 const STYLES = {
@@ -24,12 +25,22 @@ const STYLES = {
   },
 } as const;
 
+const CHECKOUT_VALUE = 47.90;
+const CHECKOUT_CURRENCY = "BRL";
+
 export default function Results() {
   const [showCta, setShowCta] = useState(false);
+  const { trackInitiateCheckout } = useMetaPixel();
 
   const handleCtaReady = useCallback(() => {
     setShowCta(true);
   }, []);
+
+  const handleCheckoutClick = useCallback(() => {
+    // Disparar evento InitiateCheckout no Meta Pixel
+    trackInitiateCheckout(CHECKOUT_VALUE, CHECKOUT_CURRENCY);
+    console.log('[Results] InitiateCheckout event tracked');
+  }, [trackInitiateCheckout]);
 
   const paymentImageUrl = useMemo(() => 
     "https://files.manuscdn.com/user_upload_by_module/session_file/310419663029970056/rSYOXPvggmmPhFxs.webp",
@@ -185,6 +196,7 @@ export default function Results() {
                 href="https://pay.hotmart.com/J103234260Q?checkoutMode=10"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={handleCheckoutClick}
                 className="pulse-button block w-full p-4 md:p-6 rounded-2xl font-bold transition-all duration-300 hover:scale-105 active:scale-95 no-underline"
                 style={{
                   fontFamily: QUIZ_FONTS.primary,

@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { useLocation } from "wouter";
 import { AnimatePresence } from "framer-motion";
 import { QUIZ_QUESTIONS, QUIZ_COLORS } from "@/constants/quiz";
@@ -6,6 +6,8 @@ import ProgressBar from "@/components/ProgressBar";
 import QuizQuestion from "@/components/QuizQuestion";
 import ProcessingScreen from "@/components/ProcessingScreen";
 import BackButton from "@/components/BackButton";
+import { useMetaPixel } from "@/hooks/useMetaPixel";
+import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 
 interface QuizAnswers {
@@ -17,6 +19,8 @@ export default function Quiz() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<QuizAnswers>({});
   const [isProcessing, setIsProcessing] = useState(false);
+  const { getPixelData } = useMetaPixel();
+  const recordLeadMutation = trpc.tracking.recordLead.useMutation();
 
   const handleSelectAnswer = useCallback((value: string) => {
     const updatedAnswers = {
@@ -33,15 +37,37 @@ export default function Quiz() {
         // Last question answered - redirect to results
         setIsProcessing(true);
         
-        // Simulate processing time
-        setTimeout(() => {
+        // Simulate processing time and send lead event
+        setTimeout(async () => {
+          try {
+            // Capturar fbp/fbc do Meta Pixel
+            const pixelData = await getPixelData();
+            
+            // Recuperar sessionId do localStorage
+            const sessionId = localStorage.getItem('quizSessionId') || `lead-${Date.now()}`;
+            
+            // Usar sessionId como email para rastreamento
+            const email = `${sessionId}@protocolo.local`;
+            
+            await recordLeadMutation.mutateAsync({
+              email,
+              fbp: pixelData.fbp,
+              fbc: pixelData.fbc,
+            });
+            
+            console.log('[Quiz] Lead recorded successfully with sessionId:', sessionId);
+          } catch (error) {
+            console.error('[Quiz] Error recording lead:', error);
+            // Nao falhar o fluxo se o rastreamento falhar
+          }
+          
           setLocation("/results");
         }, 2000);
       }
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [currentQuestion, answers, setLocation]);
+  }, [currentQuestion, answers, setLocation, getPixelData, recordLeadMutation]);
 
   const currentQuestionData = useMemo(() => QUIZ_QUESTIONS[currentQuestion], [currentQuestion]);
 
