@@ -36,9 +36,7 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
-  // Custom API routes (quiz, webhooks, meta)
-  app.use("/api", apiRoutes);
-  // tRPC API
+  // tRPC API (must come BEFORE /api routes to avoid interception)
   app.use(
     "/api/trpc",
     createExpressMiddleware({
@@ -46,6 +44,8 @@ async function startServer() {
       createContext,
     })
   );
+  // Custom API routes (quiz, webhooks, meta)
+  app.use("/api", apiRoutes);
   // development mode uses Vite, production mode uses static files
   if (process.env.NODE_ENV === "development") {
     await setupVite(app, server);
