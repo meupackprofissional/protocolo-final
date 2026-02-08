@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import axios from 'axios';
 
-const PIXEL_ID = process.env.FACEBOOK_PIXEL_ID;
+const PIXEL_ID = process.env.FACEBOOK_PIXEL_ID || process.env.VITE_FACEBOOK_PIXEL_ID;
 const ACCESS_TOKEN = process.env.FACEBOOK_ACCESS_TOKEN;
 const API_VERSION = 'v24.0';
 
