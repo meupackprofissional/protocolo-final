@@ -16,11 +16,14 @@ export function useMetaPixel() {
         const fbp = window._fbp;
         const fbc = window._fbc;
         
+        console.log('[useMetaPixel] Captured fbp:', fbp);
+        console.log('[useMetaPixel] Captured fbc:', fbc);
+        
         resolve({
           fbp: fbp || undefined,
           fbc: fbc || undefined,
         });
-      }, 100);
+      }, 500); // Aumentado de 100ms para 500ms para garantir que o Meta Pixel inicialize
     });
   }, []);
 
