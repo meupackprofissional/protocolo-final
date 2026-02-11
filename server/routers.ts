@@ -22,7 +22,7 @@ export const appRouter = router({
     recordLead: publicProcedure
       .input(
         z.object({
-          email: z.string().email(),
+          email: z.string().min(1),
           fbp: z.string().optional(),
           fbc: z.string().optional(),
           clientIpAddress: z.string().optional(),
