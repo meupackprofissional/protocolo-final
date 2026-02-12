@@ -31,13 +31,20 @@ export const appRouter = router({
       )
       .mutation(async ({ input, ctx }) => {
         try {
+          // Gerar Event ID único
+          const eventId = `Lead_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+          
+          // Enviar evento para Meta com Event ID
           const result = await sendLeadEvent({
             email: input.email,
             fbp: input.fbp,
             fbc: input.fbc,
             clientIpAddress: input.clientIpAddress || ctx.req.ip,
-            clientUserAgent: input.clientUserAgent || ctx.req.headers['user-agent'],
+            clientUserAgent: input.clientUserAgent || (ctx.req.headers['user-agent'] as string),
+            eventId, // Passar Event ID
           });
+
+          console.log('[tRPC] Lead recorded with eventId:', eventId);
 
           return {
             success: true,

@@ -54,3 +54,23 @@ export const quizResponses = mysqlTable("quiz_responses", {
 
 export type QuizResponse = typeof quizResponses.$inferSelect;
 export type InsertQuizResponse = typeof quizResponses.$inferInsert;
+
+/**
+ * Leads table for tracking quiz completions with Meta Pixel data
+ */
+export const leads = mysqlTable("leads", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  email: varchar("email", { length: 320 }).notNull(),
+  phone: varchar("phone", { length: 20 }),
+  quiz_responses: text("quiz_responses"), // JSON stringified
+  fbp: varchar("fbp", { length: 255 }),
+  fbc: varchar("fbc", { length: 255 }),
+  user_agent: text("user_agent"),
+  ip_address: varchar("ip_address", { length: 45 }),
+  event_id: varchar("event_id", { length: 255 }), // Meta Event ID for correlation
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Lead = typeof leads.$inferSelect;
+export type InsertLead = typeof leads.$inferInsert;

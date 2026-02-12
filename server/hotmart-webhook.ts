@@ -130,6 +130,9 @@ export async function handlePurchaseApprovedWebhook(
 
     // 3. Enviar evento para Meta CAPI
     try {
+      // Recuperar Event ID do lead para correlacionar com Purchase
+      const eventId = lead?.event_id;
+      
       const metaResponse = await sendPurchaseEvent({
         email,
         phone: hotmartData.buyer.checkout_phone,
@@ -140,6 +143,7 @@ export async function handlePurchaseApprovedWebhook(
         productName: hotmartData.product.name,
         productId: hotmartData.product.ucode,
         transactionId,
+        eventId, // Usar MESMO Event ID do Lead
         hotmartData,
       });
 

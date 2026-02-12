@@ -31,6 +31,7 @@ interface ConversionEvent {
   fbc?: string;
   clientIpAddress?: string;
   clientUserAgent?: string;
+  eventId?: string; // Event ID para correlacionar Lead com Purchase
 }
 
 /**
@@ -88,7 +89,7 @@ export async function sendToMetaCAPI(event: ConversionEvent) {
         {
           event_name: event.eventName,
           event_time: Math.floor(Date.now() / 1000),
-          event_id: `${event.eventName}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          event_id: event.eventId || `${event.eventName}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
           action_source: 'website',
           event_source_url: event.eventSourceUrl || 'https://seuquiz.com.br',
           user_data: userData,
@@ -131,6 +132,7 @@ export async function sendLeadEvent(data: {
   clientIpAddress?: string;
   clientUserAgent?: string;
   quizResponses?: Record<string, any>;
+  eventId?: string; // Event ID para correlacionar com Purchase
 }) {
   return sendToMetaCAPI({
     eventName: 'Lead',
@@ -142,6 +144,7 @@ export async function sendLeadEvent(data: {
     fbc: data.fbc,
     clientIpAddress: data.clientIpAddress,
     clientUserAgent: data.clientUserAgent,
+    eventId: data.eventId,
     customData: {
       content_name: 'Quiz - Sono do Bebê',
       content_type: 'lead_form',
@@ -166,6 +169,7 @@ export async function sendPurchaseEvent(data: {
   productName: string;
   productId: string;
   transactionId: string;
+  eventId?: string; // Event ID para correlacionar com Lead
   hotmartData?: Record<string, any>;
 }) {
   return sendToMetaCAPI({
@@ -178,6 +182,7 @@ export async function sendPurchaseEvent(data: {
     fbc: data.fbc,
     clientIpAddress: data.clientIpAddress,
     clientUserAgent: data.clientUserAgent,
+    eventId: data.eventId,
     customData: {
       content_ids: [data.productId],
       content_name: data.productName,
